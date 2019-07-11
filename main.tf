@@ -183,12 +183,12 @@ resource "azurerm_service_fabric_cluster" "test" {
   location            = "${azurerm_resource_group.test.location}"
   reliability_level   = "Bronze"
   upgrade_mode        = "Manual"
-  cluster_code_version = "6.5.639.9590"
+  cluster_code_version = "6.5.641.9590"
   vm_image            = "Windows"
   management_endpoint = "https://${azurerm_public_ip.test.fqdn}:19080"
 
   add_on_features = [ "DnsService" ]
-  node_type {
+     node_type {
     name                 = "${random_string.vmname.result}"
     instance_count       = "${var.clustersize}"
     is_primary           = true
@@ -207,13 +207,19 @@ resource "azurerm_service_fabric_cluster" "test" {
   fabric_settings {
     name = "Security"
     parameters = {
-      "ClusterProtectionLevel" = "EncryptAndSign"
+      "ClusterProtectionLevel" = "EncryptAndSign"    
+      }
+  }
+  fabric_settings {
+    name = "ClusterManager"
+    parameters = {
+      EnableDefaultServicesUpgrade = "False"
     }
   }
-
+ 
   certificate {
-    thumbprint = "2D09655FAAEDAE8F48F3170D169709C4A1D62219"
-    thumbprint_secondary = "2D09655FAAEDAE8F48F3170D169709C4A1D62219"
+    thumbprint = "FECE88E693F75ACB5C954F8AE23BEF14D03061D7"
+    thumbprint_secondary = "FECE88E693F75ACB5C954F8AE23BEF14D03061D7"
     x509_store_name = "My"
   }
 
@@ -233,7 +239,7 @@ resource "azurerm_virtual_machine_scale_set" "test" {
   overprovision       = false
 
   sku {
-    name     = "Standard_D1_v2"
+    name     = "Standard_D3_v2"
     tier     = "Standard"
     capacity = "${var.clustersize}"
   }
@@ -245,8 +251,8 @@ resource "azurerm_virtual_machine_scale_set" "test" {
 
   storage_profile_image_reference {
     publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServerSemiAnnual"
-    sku       = "Datacenter-Core-1709-with-Containers-smalldisk"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
     version   = "latest"
   }
   storage_profile_os_disk {
@@ -271,8 +277,9 @@ resource "azurerm_virtual_machine_scale_set" "test" {
   os_profile_secrets     {
       source_vault_id = "/subscriptions/076a77c7-eb05-4b3c-9b18-56907d1e40c3/resourceGroups/sslresources/providers/Microsoft.KeyVault/vaults/ssltvault"
       vault_certificates {
-          certificate_url = "https://ssltvault.vault.azure.net/secrets/ukresource/4a8afb9bd94e49658a8653fb2d4c1d2d"
+          certificate_url = "https://ssltvault.vault.azure.net/secrets/ukfabric-sf/ab0d8aec929c45d2a20ea60b050b08ca"
           certificate_store = "My"
+          
         }
       }
   network_profile {
@@ -284,7 +291,7 @@ resource "azurerm_virtual_machine_scale_set" "test" {
       name                                   = "TestIPConfiguration"
       subnet_id                              = "${azurerm_subnet.test.id}"
       load_balancer_backend_address_pool_ids = ["${azurerm_lb_backend_address_pool.test.id}"]
-      #load_balancer_inbound_nat_rules_ids    = ["${element(azurerm_lb_nat_pool.test.*.id, count.index)}"]
+      load_balancer_inbound_nat_rules_ids    = ["${element(azurerm_lb_nat_pool.test.*.id, count.index)}"]
     }
   }
 
@@ -295,7 +302,7 @@ resource "azurerm_virtual_machine_scale_set" "test" {
     publisher            = "Microsoft.Azure.ServiceFabric"
     type                 = "ServiceFabricNode"
     type_handler_version = "1.0"
-    settings             = "{  \"certificate\": { \"thumbprint\": \"2D09655FAAEDAE8F48F3170D169709C4A1D62219\", \"x509StoreName\": \"My\" } , \"clusterEndpoint\": \"${azurerm_service_fabric_cluster.test.cluster_endpoint}\", \"nodeTypeRef\": \"${random_string.vmname.result}\", \"dataPath\": \"D:\\\\SvcFab\",\"durabilityLevel\": \"Bronze\",\"nicPrefixOverride\": \"10.0.0.0/24\"}"
+    settings             = "{  \"certificate\": { \"thumbprint\": \"FECE88E693F75ACB5C954F8AE23BEF14D03061D7\", \"x509StoreName\": \"My\" } , \"clusterEndpoint\": \"${azurerm_service_fabric_cluster.test.cluster_endpoint}\", \"nodeTypeRef\": \"${random_string.vmname.result}\", \"dataPath\": \"D:\\\\SvcFab\",\"durabilityLevel\": \"Bronze\",\"nicPrefixOverride\": \"10.0.0.0/24\"}"
   }
 
  }
