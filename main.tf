@@ -218,8 +218,8 @@ resource "azurerm_service_fabric_cluster" "test" {
   }
  
   certificate {
-    thumbprint = "FECE88E693F75ACB5C954F8AE23BEF14D03061D7"
-    thumbprint_secondary = "FECE88E693F75ACB5C954F8AE23BEF14D03061D7"
+    thumbprint = "<thumbprint>"
+    thumbprint_secondary = ">thumbprint>"
     x509_store_name = "My"
   }
 
@@ -275,9 +275,9 @@ resource "azurerm_virtual_machine_scale_set" "test" {
   }
 
   os_profile_secrets     {
-      source_vault_id = "/subscriptions/076a77c7-eb05-4b3c-9b18-56907d1e40c3/resourceGroups/sslresources/providers/Microsoft.KeyVault/vaults/ssltvault"
+      source_vault_id = "/<subscription string>"
       vault_certificates {
-          certificate_url = "https://ssltvault.vault.azure.net/secrets/ukfabric-sf/ab0d8aec929c45d2a20ea60b050b08ca"
+          certificate_url = "<certifiate secret URL>"
           certificate_store = "My"
           
         }
@@ -302,7 +302,7 @@ resource "azurerm_virtual_machine_scale_set" "test" {
     publisher            = "Microsoft.Azure.ServiceFabric"
     type                 = "ServiceFabricNode"
     type_handler_version = "1.0"
-    settings             = "{  \"certificate\": { \"thumbprint\": \"FECE88E693F75ACB5C954F8AE23BEF14D03061D7\", \"x509StoreName\": \"My\" } , \"clusterEndpoint\": \"${azurerm_service_fabric_cluster.test.cluster_endpoint}\", \"nodeTypeRef\": \"${random_string.vmname.result}\", \"dataPath\": \"D:\\\\SvcFab\",\"durabilityLevel\": \"Bronze\",\"nicPrefixOverride\": \"10.0.0.0/24\"}"
+    settings             = "{  \"certificate\": { \"thumbprint\": \"<ert thumbprint>\", \"x509StoreName\": \"My\" } , \"clusterEndpoint\": \"${azurerm_service_fabric_cluster.test.cluster_endpoint}\", \"nodeTypeRef\": \"${random_string.vmname.result}\", \"dataPath\": \"D:\\\\SvcFab\",\"durabilityLevel\": \"Bronze\",\"nicPrefixOverride\": \"10.0.0.0/24\"}"
   }
 
  }
